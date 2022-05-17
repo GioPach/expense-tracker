@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import * as C from "./App.styles";
 import { Item } from "./types/Item";
+import { categories } from "./data/categories";
 import { items } from "./data/items";
 import { getCurrentMonth, filterListByMonth } from "./helpers/dateFilter";
 import { TableArea } from "./components/TableArea";
 import { InfoArea } from "./components/InfoArea";
-import { categories } from "./data/categories";
+import { InsertArea } from "./components/InsertArea";
 
 const App = () => {
   const [list, setList] = useState(items);
@@ -22,20 +23,26 @@ const App = () => {
     let incomeCount = 0;
     let expenseCount = 0;
 
-    filteredList.forEach((item) => {
-      if (categories[item.category].expense) {
-        expenseCount += item.value;
+    for (let i in filteredList) {
+      if (categories[filteredList[i].category].expense) {
+        expenseCount += filteredList[i].value;
       } else {
-        incomeCount += item.value;
+        incomeCount += filteredList[i].value;
       }
+    }
 
-      setIncome(incomeCount);
-      setExpense(expenseCount);
-    });
+    setIncome(incomeCount);
+    setExpense(expenseCount);
   }, [filteredList]);
 
   const handleMonthChange = (newMonth: string) => {
     setCurrentMonth(newMonth);
+  };
+
+  const handleAddItem = (item: Item) => {
+    let newList = [...list];
+    newList.push(item);
+    setList(newList);
   };
 
   return (
@@ -51,7 +58,7 @@ const App = () => {
           expense={expense}
         />
 
-        {/* Área de inserção */}
+        <InsertArea onAdd={handleAddItem} />
 
         <TableArea list={filteredList} />
       </C.Body>
